@@ -18,3 +18,43 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
 });
+
+// this should return notes.html
+app.get('/notes', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/notes.html'));
+    //res.status(200).json(db);
+    console.log(db);
+});
+
+// post route to add new notes to db.json
+app.post('/api/notes', (req, res) => {
+    const { title, text } = req.body;
+    // note body, id should be a random number
+    const newNote = {
+        title,
+        text,
+        id: Math.random()
+    }
+    // get existing notes from db.json and add new notes to it
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            const notes = JSON.parse(data);
+            notes.push(newNote); // add new notes
+            fs.writeFile('.db/db.json', JSON.stringify(notes), (err) => 
+            err ? console.error(err) : console.log('New note added!'))
+        }
+    })
+    const response = {
+        status: 'success',
+        body: newNote,
+    };
+
+    if (response.status === 'success') {
+        console.log(response);
+        res.status(201).json(response);
+    } else {
+        res.status(500).json('Error in posting note');
+    }
+})
