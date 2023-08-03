@@ -7,6 +7,8 @@ const path = require("path");
 const fs = require("fs");
 const db = require("./db/db.json");
 
+const PORT = process.env.PORT || 3000;
+
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -33,16 +35,17 @@ app.post('/api/notes', (req, res) => {
     const newNote = {
         title,
         text,
-        id: Math.random()
+        id: Math.floor((1 + Math.random()) * 0x1000)
     }
     // get existing notes from db.json and add new notes to it
+    // corrected path to db.json
     fs.readFile('./db/db.json', 'utf8', (err, data) => {
         if (err) {
             console.error(err);
         } else {
             const notes = JSON.parse(data);
             notes.push(newNote); // add new notes
-            fs.writeFile('.db/db.json', JSON.stringify(notes), (err) => 
+            fs.writeFile('./db/db.json', JSON.stringify(notes), (err) => 
             err ? console.error(err) : console.log('New note added!'))
         }
     })
@@ -57,4 +60,6 @@ app.post('/api/notes', (req, res) => {
     } else {
         res.status(500).json('Error in posting note');
     }
-})
+});
+
+app.listen(3000, () => console.log(`App listening at http://localhost:${PORT}`))
