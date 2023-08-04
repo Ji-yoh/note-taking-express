@@ -69,6 +69,23 @@ app.post('/api/notes', (req, res) => {
     }
 });
 
-// try to delete notes?
+// try to delete notes? ..notes are being deleted but need to restart server to see changes
+app.delete('/api/notes/:id', (req, res) => {
+    const id = req.params.id; // get note id from db.json
+    // console.log(id);
+    if (id) {
+        fs.readFile('./db/db.json', 'utf8', (err, data) => {
+            if (err) {
+                console.error(err);
+            } else {
+                const savedNotes = JSON.parse(data)
+                const newNotes = savedNotes.filter((note) => note.id != id)
+                fs.writeFile('./db/db.json', JSON.stringify(newNotes, null, 4), (err) => {
+                    err ? console.error(err) : console.log('Note deleted!')
+                })
+            }
+        })
+    }
+})
 
 app.listen(3000, () => console.log(`App listening at http://localhost:${PORT}`))
