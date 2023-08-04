@@ -28,6 +28,11 @@ app.get('/notes', (req, res) => {
     console.log(db);
 });
 
+// added get route to read db.json for user notes
+app.get('/api/notes', (req, res) => {
+    res.json(db);
+})
+
 // post route to add new notes to db.json
 app.post('/api/notes', (req, res) => {
     const { title, text } = req.body;
@@ -45,8 +50,10 @@ app.post('/api/notes', (req, res) => {
         } else {
             const notes = JSON.parse(data);
             notes.push(newNote); // add new notes
-            fs.writeFile('./db/db.json', JSON.stringify(notes), (err) => 
+            fs.writeFile('./db/db.json', JSON.stringify(notes, null, 4), (err) => 
             err ? console.error(err) : console.log('New note added!'))
+            // have notes show on notes.html
+
         }
     })
     const response = {
@@ -61,5 +68,7 @@ app.post('/api/notes', (req, res) => {
         res.status(500).json('Error in posting note');
     }
 });
+
+// try to delete notes?
 
 app.listen(3000, () => console.log(`App listening at http://localhost:${PORT}`))
